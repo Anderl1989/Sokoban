@@ -7,6 +7,13 @@ const TARGET = '.';
 const FLOOR_INSIDE = '-';
 const FLOOR_OUTSIDE = '_';
 
+const DIRECTION = {
+    UP: 'UP',
+    DOWN: 'DOWN',
+    LEFT: 'LEFT',
+    RIGHT: 'RIGHT',
+};
+
 const splitLevels = levelsText.trim().split('\n\n');
 
 
@@ -106,6 +113,7 @@ class Sokoban {
         playerImg.src = 'assets/flat/player.png';
         playerImg.alt = 'Player';
         playfield.appendChild(playerImg);
+        this.player.img = playerImg;
 
         for (let i = 0; i < this.boxes.length; i++) {
             const box = this.boxes[i];
@@ -115,10 +123,84 @@ class Sokoban {
             boxImg.src = 'assets/flat/box.png';
             boxImg.alt = 'Box';
             playfield.appendChild(boxImg);
+            box.img = boxImg;
+        }
+    }
+
+    move(direction) {
+        let target;
+        let boxTarget;
+        switch (direction) {
+            case DIRECTION.RIGHT:
+                target = { x: this.player.x + 1, y: this.player.y };
+                boxTarget = { x: this.player.x + 2, y: this.player.y };
+                break;
+            case DIRECTION.LEFT:
+                target = { x: this.player.x - 1, y: this.player.y };
+                boxTarget = { x: this.player.x - 2, y: this.player.y };
+                break;
+            case DIRECTION.DOWN:
+                target = { x: this.player.x, y: this.player.y + 1 };
+                boxTarget = { x: this.player.x, y: this.player.y + 2 };
+                break;
+            case DIRECTION.UP:
+                target = { x: this.player.x, y: this.player.y - 1 };
+                boxTarget = { x: this.player.x, y: this.player.y - 2 };
+                break;
+        }
+
+        let canMove = true;
+
+        const box = this.boxes.find(b => b.x === target.x && b.y === target.y);
+
+        if (box) {
+            const boxAtBoxTarget = this.boxes.find(b => b.x === boxTarget.x && b.y === boxTarget.y);
+
+            if (boxAtBoxTarget || (this.level[boxTarget.y] && this.level[boxTarget.y][boxTarget.x] === WALL)) {
+                canMove = false;
+            } else {
+                box.x = boxTarget.x;
+                box.y = boxTarget.y;
+                box.img.style.left = `${box.x * 48}px`;
+                box.img.style.top = `${box.y * 48}px`;
+            }
+        } else {
+            if (this.level[target.y] && this.level[target.y][target.x] === WALL) {
+                canMove = false;
+            }
+        }
+
+        if (canMove) {
+            this.player.x = target.x;
+            this.player.y = target.y;
+            this.player.img.style.left = `${this.player.x * 48}px`;
+            this.player.img.style.top = `${this.player.y * 48}px`;
         }
     }
 }
 
-const game = new Sokoban(splitLevels[0]);
+const game = new Sokoban(splitLevels[2]);
 
 console.log('game', game);
+
+document.addEventListener('keydown', (e) => {
+    console.log(e);
+    switch (e.code) {
+        case 'ArrowRight':
+        case 'KeyD':
+            game.move(DIRECTION.RIGHT);
+            break;
+        case 'ArrowLeft':
+        case 'KeyA':
+            game.move(DIRECTION.LEFT);
+            break;
+        case 'ArrowDown':
+        case 'KeyS':
+            game.move(DIRECTION.DOWN);
+            break;
+        case 'ArrowUp':
+        case 'KeyW':
+            game.move(DIRECTION.UP);
+            break;
+    }
+});
