@@ -14,8 +14,9 @@ const DIRECTION = {
     RIGHT: 'RIGHT',
 };
 
-const splitLevels = levelsText.trim().split('\n\n');
+let progress = 0;
 
+const splitLevels = levelsText.trim().split('\n\n');
 
 class Sokoban {
     constructor(levelText) {
@@ -25,6 +26,7 @@ class Sokoban {
         this.moves = 0;
         this.isWon = false;
 
+        document.getElementById('win').style.display = 'none';
         document.getElementById('moves').innerText = this.moves;
 
         const levelRows = levelText.split('\n');
@@ -81,6 +83,7 @@ class Sokoban {
 
     drawPlayfield() {
         const playfield = document.getElementById('playfield');
+        playfield.innerHTML = '';
 
         for (let y = 0; y < this.level.length; y++) {
             const row = this.level[y];
@@ -212,10 +215,30 @@ class Sokoban {
     }
 }
 
-const game = new Sokoban(splitLevels[0]);
+let game = new Sokoban(splitLevels[0]);
+
+// level selection
+const levelsSelect = document.getElementById('levels');
+for (let i = 0; i < splitLevels.length; i++) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.innerText = `Level ${i + 1}`;
+    levelsSelect.appendChild(option);
+}
+levelsSelect.addEventListener('change', function(event) {
+    console.log(event.target.value);
+    game = new Sokoban(splitLevels[event.target.value]);
+    levelsSelect.blur();
+});
+
+// reset button
+document.getElementById('reset').addEventListener('click', function() {
+    game = new Sokoban(splitLevels[levelsSelect.value]);
+});
 
 console.log('game', game);
 
+// input handling
 document.addEventListener('keydown', (e) => {
     console.log(e);
     switch (e.code) {
