@@ -206,11 +206,13 @@ class Sokoban {
                 this.isWon = false;
             }
         }
-        console.log('isWon', this.isWon);
+        if (this.isWon) {
+            document.getElementById('win').style.display = 'inline';
+        }
     }
 }
 
-const game = new Sokoban(splitLevels[1]);
+const game = new Sokoban(splitLevels[0]);
 
 console.log('game', game);
 

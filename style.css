@@ -9,3 +9,7 @@
     position: absolute;
     transition: left 300ms ease, top 300ms ease;
 }
+
+#win {
+    display: none;
+}
