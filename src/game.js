@@ -18,13 +18,29 @@ let progress = 0;
 
 const splitLevels = levelsText.trim().split('\n\n');
 
+const levelsSelect = document.getElementById('levels');
+function drawLevelSelection() {
+    levelsSelect.innerHTML = '';
+    for (let i = 0; i < splitLevels.length; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.innerText = `Level ${i + 1}`;
+        if (i > progress) {
+            option.disabled = 'disabled';
+        }
+        levelsSelect.appendChild(option);
+    }
+}
+drawLevelSelection();
+
 class Sokoban {
-    constructor(levelText) {
+    constructor(levelText, levelIdx) {
         this.player = null;
         this.boxes = [];
         this.level = [];
         this.moves = 0;
         this.isWon = false;
+        this.levelIdx = levelIdx;
 
         document.getElementById('win').style.display = 'none';
         document.getElementById('moves').innerText = this.moves;
@@ -211,29 +227,28 @@ class Sokoban {
         }
         if (this.isWon) {
             document.getElementById('win').style.display = 'inline';
+            if (this.levelIdx >= progress) {
+                progress += 1;
+                drawLevelSelection();
+            }
         }
     }
 }
 
-let game = new Sokoban(splitLevels[0]);
+let game = new Sokoban(splitLevels[0], 0);
 
 // level selection
-const levelsSelect = document.getElementById('levels');
-for (let i = 0; i < splitLevels.length; i++) {
-    const option = document.createElement('option');
-    option.value = i;
-    option.innerText = `Level ${i + 1}`;
-    levelsSelect.appendChild(option);
-}
 levelsSelect.addEventListener('change', function(event) {
     console.log(event.target.value);
-    game = new Sokoban(splitLevels[event.target.value]);
+    const levelIdx = parseInt(event.target.value, 10);
+    game = new Sokoban(splitLevels[levelIdx], levelIdx);
     levelsSelect.blur();
 });
 
 // reset button
-document.getElementById('reset').addEventListener('click', function() {
-    game = new Sokoban(splitLevels[levelsSelect.value]);
+document.getElementById('reset').addEventListener('click', function () {
+    const levelIdx = parseInt(levelsSelect.value, 10);
+    game = new Sokoban(splitLevels[levelIdx], levelIdx);
 });
 
 console.log('game', game);
