@@ -22,6 +22,10 @@ class Sokoban {
         this.player = null;
         this.boxes = [];
         this.level = [];
+        this.moves = 0;
+        this.isWon = false;
+
+        document.getElementById('moves').innerText = this.moves;
 
         const levelRows = levelText.split('\n');
         for (let y = 0; y < levelRows.length; y++) {
@@ -128,6 +132,9 @@ class Sokoban {
     }
 
     move(direction) {
+        if (this.isWon) {
+            return;
+        }
         let target;
         let boxTarget;
         switch (direction) {
@@ -150,6 +157,16 @@ class Sokoban {
         }
 
         let canMove = true;
+
+        // const box = this.boxes.find(function(b) {
+        //     return b.x === target.x && b.y === target.y;
+        // });
+
+        // const box = this.boxes.find((b) => {
+        //     return b.x === target.x && b.y === target.y;
+        // });
+
+        // const box = this.boxes.find((b) => b.x === target.x && b.y === target.y);
 
         const box = this.boxes.find(b => b.x === target.x && b.y === target.y);
 
@@ -175,11 +192,25 @@ class Sokoban {
             this.player.y = target.y;
             this.player.img.style.left = `${this.player.x * 48}px`;
             this.player.img.style.top = `${this.player.y * 48}px`;
+            this.moves += 1;
+            this.checkWin();
         }
+        document.getElementById('moves').innerText = this.moves;
+    }
+
+    checkWin() {
+        this.isWon = true;
+        for (let i = 0; i < this.boxes.length; i++) {
+            const box = this.boxes[i];
+            if (!this.level[box.y] || this.level[box.y][box.x] !== TARGET) {
+                this.isWon = false;
+            }
+        }
+        console.log('isWon', this.isWon);
     }
 }
 
-const game = new Sokoban(splitLevels[2]);
+const game = new Sokoban(splitLevels[1]);
 
 console.log('game', game);
 
