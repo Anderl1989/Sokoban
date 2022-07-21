@@ -17,9 +17,10 @@ const DIRECTION = {
 const DRAW_MODES = {
     FLAT: 'flat',
     INCLINED: 'inclined',
+    ISOMETRIC: 'isometric',
 };
 
-const drawMode = DRAW_MODES.INCLINED;
+const drawMode = DRAW_MODES.ISOMETRIC;
 
 const savedProgress = localStorage.getItem('progress');
 let progress = savedProgress ? parseInt(savedProgress, 10) : 0;
@@ -286,6 +287,21 @@ class Sokoban {
                     img.addEventListener('transitionend', transitionEnd);
                 } else {
                     img.style.zIndex = y;
+                }
+                break;
+            case DRAW_MODES.ISOMETRIC:
+                img.style.width = '84px';
+                img.style.height = '84px';
+                img.style.left = `${((x - y) * 42) + (this.level.length * 42)}px`;
+                img.style.top = `${(x + y) * 21}px`;
+                if (direction === DIRECTION.UP || direction === DIRECTION.LEFT) {
+                    function transitionEnd() {
+                        img.style.zIndex = x + y;
+                        img.removeEventListener('transitionend', transitionEnd);
+                    }
+                    img.addEventListener('transitionend', transitionEnd);
+                } else {
+                    img.style.zIndex = x + y;
                 }
                 break;
         }
