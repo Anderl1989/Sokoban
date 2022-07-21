@@ -384,24 +384,29 @@ document.getElementById('name').addEventListener('keydown', (e) => {
 });
 
 // input handling
+let lastAction = 0;
 document.addEventListener('keydown', (e) => {
-    console.log(e);
-    switch (e.code) {
-        case 'ArrowRight':
-        case 'KeyD':
-            game.move(DIRECTION.RIGHT);
-            break;
-        case 'ArrowLeft':
-        case 'KeyA':
-            game.move(DIRECTION.LEFT);
-            break;
-        case 'ArrowDown':
-        case 'KeyS':
-            game.move(DIRECTION.DOWN);
-            break;
-        case 'ArrowUp':
-        case 'KeyW':
-            game.move(DIRECTION.UP);
-            break;
+    const time = Date.now();
+    if (time - lastAction > 300) {
+        lastAction = time;
+        console.log(e);
+        switch (e.code) {
+            case 'ArrowRight':
+            case 'KeyD':
+                game.move(DIRECTION.RIGHT);
+                break;
+            case 'ArrowLeft':
+            case 'KeyA':
+                game.move(DIRECTION.LEFT);
+                break;
+            case 'ArrowDown':
+            case 'KeyS':
+                game.move(DIRECTION.DOWN);
+                break;
+            case 'ArrowUp':
+            case 'KeyW':
+                game.move(DIRECTION.UP);
+                break;
+        }
     }
 });
