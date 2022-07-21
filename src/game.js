@@ -152,8 +152,7 @@ class Sokoban {
             for (let x = 0; x < row.length; x++) {
                 const char = row[x];
                 const img = document.createElement('img');
-                img.style.left = `${x * 48}px`;
-                img.style.top = `${y * 48}px`;
+                this.drawImgAt(img, x, y);
                 switch (char) {
                     case WALL:
                         img.src = 'assets/flat/wall.png';
@@ -177,8 +176,7 @@ class Sokoban {
         }
 
         const playerImg = document.createElement('img');
-        playerImg.style.left = `${this.player.x * 48}px`;
-        playerImg.style.top = `${this.player.y * 48}px`;
+        this.drawImgAt(playerImg, this.player.x, this.player.y);
         playerImg.src = 'assets/flat/player.png';
         playerImg.alt = 'Player';
         playfield.appendChild(playerImg);
@@ -187,8 +185,7 @@ class Sokoban {
         for (let i = 0; i < this.boxes.length; i++) {
             const box = this.boxes[i];
             const boxImg = document.createElement('img');
-            boxImg.style.left = `${box.x * 48}px`;
-            boxImg.style.top = `${box.y * 48}px`;
+            this.drawImgAt(boxImg, box.x, box.y);
             boxImg.src = 'assets/flat/box.png';
             boxImg.alt = 'Box';
             playfield.appendChild(boxImg);
@@ -243,8 +240,7 @@ class Sokoban {
             } else {
                 box.x = boxTarget.x;
                 box.y = boxTarget.y;
-                box.img.style.left = `${box.x * 48}px`;
-                box.img.style.top = `${box.y * 48}px`;
+                this.drawImgAt(box.img, box.x, box.y);
             }
         } else {
             if (this.level[target.y] && this.level[target.y][target.x] === WALL) {
@@ -255,12 +251,18 @@ class Sokoban {
         if (canMove) {
             this.player.x = target.x;
             this.player.y = target.y;
-            this.player.img.style.left = `${this.player.x * 48}px`;
-            this.player.img.style.top = `${this.player.y * 48}px`;
+            this.drawImgAt(this.player.img, this.player.x, this.player.y);
             this.moves += 1;
             this.checkWin();
         }
         document.getElementById('moves').innerText = this.moves;
+    }
+
+    drawImgAt(img, x, y) {
+        img.style.width = '48px';
+        img.style.height = '48px';
+        img.style.left = `${x * 48}px`;
+        img.style.top = `${y * 48}px`;
     }
 
     checkWin() {
