@@ -14,7 +14,8 @@ const DIRECTION = {
     RIGHT: 'RIGHT',
 };
 
-let progress = 0;
+const savedProgress = localStorage.getItem('progress');
+let progress = savedProgress ? parseInt(savedProgress, 10) : 0;
 
 const splitLevels = levelsText.trim().split('\n\n');
 
@@ -32,6 +33,7 @@ function drawLevelSelection() {
     }
 }
 drawLevelSelection();
+levelsSelect.value = progress;
 
 class Sokoban {
     constructor(levelText, levelIdx) {
@@ -229,13 +231,15 @@ class Sokoban {
             document.getElementById('win').style.display = 'inline';
             if (this.levelIdx >= progress) {
                 progress += 1;
+                localStorage.setItem('progress', progress);
                 drawLevelSelection();
+                levelsSelect.value = this.levelIdx;
             }
         }
     }
 }
 
-let game = new Sokoban(splitLevels[0], 0);
+let game = new Sokoban(splitLevels[progress], progress);
 
 // level selection
 levelsSelect.addEventListener('change', function(event) {
