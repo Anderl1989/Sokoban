@@ -7,8 +7,29 @@
     <body>
         <select id="levels"></select>
         <button id="reset">Reset</button>
-        <p>Moves: <span id="moves"></span><span id="win"> - Gewonnen!</span></p>
-        <div id="playfield"></div>
+
+        <div class="container">
+            <div>
+                <p>Highscores:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platzierung</th>
+                            <th>Name</th>
+                            <th>Züge</th>
+                        </tr>
+                    </thead>
+                    <tbody id="highscores">
+
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <p>Züge: <span id="moves"></span><span id="win"> - Gewonnen!</span></p>
+                <div id="playfield"></div>
+            </div>
+        </div>
+        
         <script type="text/javascript" src="src/levels.js"></script>
         <script type="text/javascript" src="src/game.js"></script>
     </body>

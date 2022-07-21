@@ -97,6 +97,44 @@ class Sokoban {
         }
 
         this.drawPlayfield();
+        this.drawHighscores();
+    }
+
+    drawHighscores() {
+        const request = new XMLHttpRequest();
+
+        const method = 'GET';
+        const levelParam = encodeURIComponent(`level=${this.levelIdx}`);
+        const url = `https://sapientcactus.backendless.app/api/data/anderl?property=level&property=name&property=score&having=${levelParam}`;
+
+        request.open(method, url);
+
+        request.addEventListener('load', function (event) {
+            console.log(request.status, request.responseText);
+            if (request.status === 200) {
+                const scores = JSON.parse(request.responseText);
+                console.log('scores', scores);
+                const table = document.getElementById('highscores');
+                table.innerHTML = '';
+                for (let i = 0; i < scores.length; i++) {
+                    const score = scores[i];
+                    const tr = document.createElement('tr');
+                    const positionCol = document.createElement('td');
+                    const nameCol = document.createElement('td');
+                    const movesCol = document.createElement('td');
+                    positionCol.innerText = i + 1;
+                    nameCol.innerText = score.name;
+                    movesCol.innerText = score.score;
+                    tr.appendChild(positionCol);
+                    tr.appendChild(nameCol);
+                    tr.appendChild(movesCol);
+                    table.appendChild(tr);
+                }
+                
+            }
+        });
+
+        request.send();
     }
 
     drawPlayfield() {
