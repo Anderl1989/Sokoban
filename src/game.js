@@ -14,6 +14,13 @@ const DIRECTION = {
     RIGHT: 'RIGHT',
 };
 
+const DRAW_MODES = {
+    FLAT: 'flat',
+    INCLINED: 'inclined',
+};
+
+const drawMode = DRAW_MODES.INCLINED;
+
 const savedProgress = localStorage.getItem('progress');
 let progress = savedProgress ? parseInt(savedProgress, 10) : 0;
 
@@ -155,19 +162,19 @@ class Sokoban {
                 this.drawImgAt(img, x, y);
                 switch (char) {
                     case WALL:
-                        img.src = 'assets/flat/wall.png';
+                        img.src = `assets/${drawMode}/wall.png`;
                         img.alt = 'Wall';
                         break;
                     case TARGET:
-                        img.src = 'assets/flat/target.png';
+                        img.src = `assets/${drawMode}/target.png`;
                         img.alt = 'Target';
                         break;
                     case FLOOR_INSIDE:
-                        img.src = 'assets/flat/floor.png';
+                        img.src = `assets/${drawMode}/floor.png`;
                         img.alt = 'Floor';
                         break;
                     case FLOOR_OUTSIDE:
-                        img.src = 'assets/flat/grass.png';
+                        img.src = `assets/${drawMode}/grass.png`;
                         img.alt = 'Grass';
                         break;
                 }
@@ -177,7 +184,7 @@ class Sokoban {
 
         const playerImg = document.createElement('img');
         this.drawImgAt(playerImg, this.player.x, this.player.y);
-        playerImg.src = 'assets/flat/player.png';
+        playerImg.src = `assets/${drawMode}/player.png`;
         playerImg.alt = 'Player';
         playfield.appendChild(playerImg);
         this.player.img = playerImg;
@@ -186,7 +193,7 @@ class Sokoban {
             const box = this.boxes[i];
             const boxImg = document.createElement('img');
             this.drawImgAt(boxImg, box.x, box.y);
-            boxImg.src = 'assets/flat/box.png';
+            boxImg.src = `assets/${drawMode}/box.png`;
             boxImg.alt = 'Box';
             playfield.appendChild(boxImg);
             box.img = boxImg;
@@ -240,7 +247,7 @@ class Sokoban {
             } else {
                 box.x = boxTarget.x;
                 box.y = boxTarget.y;
-                this.drawImgAt(box.img, box.x, box.y);
+                this.drawImgAt(box.img, box.x, box.y, direction);
             }
         } else {
             if (this.level[target.y] && this.level[target.y][target.x] === WALL) {
@@ -251,18 +258,37 @@ class Sokoban {
         if (canMove) {
             this.player.x = target.x;
             this.player.y = target.y;
-            this.drawImgAt(this.player.img, this.player.x, this.player.y);
+            this.drawImgAt(this.player.img, this.player.x, this.player.y, direction);
             this.moves += 1;
             this.checkWin();
         }
         document.getElementById('moves').innerText = this.moves;
     }
 
-    drawImgAt(img, x, y) {
-        img.style.width = '48px';
-        img.style.height = '48px';
-        img.style.left = `${x * 48}px`;
-        img.style.top = `${y * 48}px`;
+    drawImgAt(img, x, y, direction) {
+        switch (drawMode) {
+            case DRAW_MODES.FLAT:
+                img.style.width = '48px';
+                img.style.height = '48px';
+                img.style.left = `${x * 48}px`;
+                img.style.top = `${y * 48}px`;
+                break;
+            case DRAW_MODES.INCLINED:
+                img.style.width = '48px';
+                img.style.height = '84px';
+                img.style.left = `${x * 48}px`;
+                img.style.top = `${y * 42}px`;
+                if (direction === DIRECTION.UP) {
+                    function transitionEnd() {
+                        img.style.zIndex = y;
+                        img.removeEventListener('transitionend', transitionEnd);
+                    }
+                    img.addEventListener('transitionend', transitionEnd);
+                } else {
+                    img.style.zIndex = y;
+                }
+                break;
+        }
     }
 
     checkWin() {
