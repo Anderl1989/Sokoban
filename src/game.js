@@ -45,6 +45,7 @@ class Sokoban {
         this.levelIdx = levelIdx;
 
         document.getElementById('win').style.display = 'none';
+        document.getElementById('send').disabled = true;
         document.getElementById('moves').innerText = this.moves;
 
         const levelRows = levelText.split('\n');
@@ -272,6 +273,7 @@ class Sokoban {
         }
         if (this.isWon) {
             document.getElementById('win').style.display = 'inline';
+            document.getElementById('send').disabled = false;
             if (this.levelIdx >= progress) {
                 progress += 1;
                 localStorage.setItem('progress', progress);
@@ -296,6 +298,39 @@ levelsSelect.addEventListener('change', function(event) {
 document.getElementById('reset').addEventListener('click', function () {
     const levelIdx = parseInt(levelsSelect.value, 10);
     game = new Sokoban(splitLevels[levelIdx], levelIdx);
+});
+
+document.getElementById('send').addEventListener('click', function () {
+    if (game.isWon) {
+        const name = document.getElementById('name').value.trim();
+        if (name.length > 0) {
+            const score = game.moves;
+            const level = game.levelIdx;
+
+            const request = new XMLHttpRequest();
+
+            const method = 'POST';
+            const url = 'https://sapientcactus.backendless.app/api/data/anderl';
+
+            request.open(method, url);
+
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.addEventListener('load', function (event) {
+                console.log(request.status);
+                if (request.status === 200) {
+                    document.getElementById('send').disabled = true;
+                    game.drawHighscores();
+                }
+            });
+
+            request.send(JSON.stringify({
+                name,
+                score,
+                level,
+            }));
+        }
+    }
 });
 
 console.log('game', game);
