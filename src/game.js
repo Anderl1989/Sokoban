@@ -335,6 +335,10 @@ document.getElementById('send').addEventListener('click', function () {
 
 console.log('game', game);
 
+document.getElementById('name').addEventListener('keydown', (e) => {
+    e.stopPropagation();
+});
+
 // input handling
 document.addEventListener('keydown', (e) => {
     console.log(e);
