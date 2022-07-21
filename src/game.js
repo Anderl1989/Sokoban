@@ -113,9 +113,14 @@ class Sokoban {
             console.log(request.status, request.responseText);
             if (request.status === 200) {
                 const scores = JSON.parse(request.responseText);
+                scores.sort(function (a, b) {
+                    return a.score - b.score;
+                });
                 console.log('scores', scores);
+
                 const table = document.getElementById('highscores');
                 table.innerHTML = '';
+
                 for (let i = 0; i < scores.length; i++) {
                     const score = scores[i];
                     const tr = document.createElement('tr');
