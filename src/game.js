@@ -20,31 +20,6 @@ const DRAW_MODES = {
     ISOMETRIC: 'isometric',
 };
 
-function serverRequest(url, method = 'GET', requestBody = null) {
-    return new Promise(function(resolve, reject) {
-        const request = new XMLHttpRequest();
-
-        request.open(method, url);
-
-        if (requestBody) request.setRequestHeader("Content-Type", "application/json");
-
-        request.addEventListener('load', function (event) {
-            if (request.status >= 200 && request.status < 300) {
-                const data = JSON.parse(request.responseText);
-                resolve(data);
-            } else {
-                reject(request.responseText);
-            }
-        });
-
-        if (requestBody) {
-            request.send(JSON.stringify(requestBody));
-        } else {
-            request.send();
-        }
-    });
-}
-
 let drawMode = DRAW_MODES.FLAT;
 
 const savedProgress = localStorage.getItem('progress');
@@ -138,7 +113,10 @@ class Sokoban {
         const levelParam = encodeURIComponent(`level=${this.levelIdx}`);
         const url = `https://sapientcactus.backendless.app/api/data/anderl?property=level&property=name&property=score&having=${levelParam}`;
 
-        serverRequest(url)
+        fetch(url)
+            .then((response) => {
+                return response.json();
+            })
             .then((scores) => {
                 scores.sort(function (a, b) {
                     return a.score - b.score;
@@ -377,7 +355,14 @@ document.getElementById('send').addEventListener('click', function () {
 
             const url = 'https://sapientcactus.backendless.app/api/data/anderl';
 
-            serverRequest(url, 'POST', { name, score, level })
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, score, level }),
+            })
+                .then((response) => {
+                    return response.json();
+                })
                 .then(() => {
                     document.getElementById('send').disabled = true;
                     game.drawHighscores();
