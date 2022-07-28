@@ -20,7 +20,7 @@ const DRAW_MODES = {
     ISOMETRIC: 'isometric',
 };
 
-const drawMode = DRAW_MODES.ISOMETRIC;
+let drawMode = DRAW_MODES.FLAT;
 
 const savedProgress = localStorage.getItem('progress');
 let progress = savedProgress ? parseInt(savedProgress, 10) : 0;
@@ -329,6 +329,13 @@ class Sokoban {
 }
 
 let game = new Sokoban(splitLevels[progress], progress);
+
+// draw mode selection
+const modeSelector = document.getElementById('drawmode');
+modeSelector.addEventListener('change', function(event) {
+    drawMode = event.target.value;
+    game.drawPlayfield();
+});
 
 // level selection
 levelsSelect.addEventListener('change', function(event) {
