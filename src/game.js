@@ -20,6 +20,31 @@ const DRAW_MODES = {
     ISOMETRIC: 'isometric',
 };
 
+function serverRequest(url, method = 'GET', requestBody = null) {
+    return new Promise(function(resolve, reject) {
+        const request = new XMLHttpRequest();
+
+        request.open(method, url);
+
+        if (requestBody) request.setRequestHeader("Content-Type", "application/json");
+
+        request.addEventListener('load', function (event) {
+            if (request.status >= 200 && request.status < 300) {
+                const data = JSON.parse(request.responseText);
+                resolve(data);
+            } else {
+                reject(request.responseText);
+            }
+        });
+
+        if (requestBody) {
+            request.send(JSON.stringify(requestBody));
+        } else {
+            request.send();
+        }
+    });
+}
+
 let drawMode = DRAW_MODES.FLAT;
 
 const savedProgress = localStorage.getItem('progress');
@@ -110,18 +135,11 @@ class Sokoban {
     }
 
     drawHighscores() {
-        const request = new XMLHttpRequest();
-
-        const method = 'GET';
         const levelParam = encodeURIComponent(`level=${this.levelIdx}`);
         const url = `https://sapientcactus.backendless.app/api/data/anderl?property=level&property=name&property=score&having=${levelParam}`;
 
-        request.open(method, url);
-
-        request.addEventListener('load', function (event) {
-            console.log(request.status, request.responseText);
-            if (request.status === 200) {
-                const scores = JSON.parse(request.responseText);
+        serverRequest(url)
+            .then((scores) => {
                 scores.sort(function (a, b) {
                     return a.score - b.score;
                 });
@@ -144,11 +162,10 @@ class Sokoban {
                     tr.appendChild(movesCol);
                     table.appendChild(tr);
                 }
-                
-            }
-        });
-
-        request.send();
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     }
 
     drawPlayfield() {
@@ -358,28 +375,16 @@ document.getElementById('send').addEventListener('click', function () {
             const score = game.moves;
             const level = game.levelIdx;
 
-            const request = new XMLHttpRequest();
-
-            const method = 'POST';
             const url = 'https://sapientcactus.backendless.app/api/data/anderl';
 
-            request.open(method, url);
-
-            request.setRequestHeader("Content-Type", "application/json");
-
-            request.addEventListener('load', function (event) {
-                console.log(request.status);
-                if (request.status === 200) {
+            serverRequest(url, 'POST', { name, score, level })
+                .then(() => {
                     document.getElementById('send').disabled = true;
                     game.drawHighscores();
-                }
-            });
-
-            request.send(JSON.stringify({
-                name,
-                score,
-                level,
-            }));
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
         }
     }
 });
